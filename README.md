@@ -102,6 +102,12 @@ SELECT CONCAT(`teachers`.`surname`, ' ' , `teachers`.`name`), `departments`.`nam
 7. BONUS: Selezionare per ogni studente il numero di tentativi sostenuti
 per ogni esame, stampando anche il voto massimo. Successivamente,
 filtrare i tentativi con voto minimo 18.
+SELECT CONCAT(`students`.`surname`, ' ' , `students`.`name`) AS fullname, `exam_student`.`vote`, SUM(`exam_student`.`exam_id`)
+FROM `students`
+INNER JOIN `exam_student` ON `exam_student`.`student_id` = `students`.`id`
+WHERE `exam_student`.`vote` <= 18
+GROUP BY fullname, `exam_student`.`vote`
+ORDER BY `students`.`surname`;
 
 
 <!-- Query con GROUP BY -->
