@@ -86,7 +86,7 @@ SELECT `students`.`surname`, `students`.`name`,`degrees`.* ,`departments`.`name`
 FROM `students`
 INNER JOIN `degrees` ON `degrees`.`id` = `students`.`degree_id`
 INNER JOIN `departments` ON `departments`.`id` = `degrees`.`department_id`
-ORDER BY `students`.`surname`;
+ORDER BY `students`.`surname`, `students`.`name`;
 
 5. Selezionare tutti i corsi di laurea con i relativi corsi e insegnanti
 SELECT CONCAT(`teachers`.`name`, ' ' , `teachers`.`surname`) AS fullname, `degrees`.`name`, `courses`.`name`
@@ -97,17 +97,37 @@ INNER JOIN `teachers` ON `teachers`.`id` = `course_teacher`.`teacher_id`;
 
 6. Selezionare tutti i docenti che insegnano nel Dipartimento di
 Matematica (54)
-SELECT CONCAT(`teachers`.`surname`, ' ' , `teachers`.`name`), `departments`.`name` FROM `teachers` INNER JOIN `course_teacher` ON `course_teacher`.`teacher_id` = `teachers`.`id` INNER JOIN `courses` ON `courses`.`id` = `course_teacher`.`course_id` INNER JOIN `degrees` ON `degrees`.`id` = `courses`.`degree_id` INNER JOIN `departments` ON `departments`.`id` = `degrees`.`department_id` WHERE `departments`.`id` = 5 ORDER BY `teachers`.`surname` ASC;
+SELECT CONCAT(`teachers`.`surname`, ' ' , `teachers`.`name`), `departments`.`name` 
+FROM `teachers` 
+INNER JOIN `course_teacher` ON `course_teacher`.`teacher_id` = `teachers`.`id` 
+INNER JOIN `courses` ON `courses`.`id` = `course_teacher`.`course_id` 
+INNER JOIN `degrees` ON `degrees`.`id` = `courses`.`degree_id` 
+INNER JOIN `departments` ON `departments`.`id` = `degrees`.`department_id` 
+WHERE `departments`.`id` = 5 
+ORDER BY `teachers`.`surname` ASC;
 
 7. BONUS: Selezionare per ogni studente il numero di tentativi sostenuti
 per ogni esame, stampando anche il voto massimo. Successivamente,
 filtrare i tentativi con voto minimo 18.
-SELECT CONCAT(`students`.`surname`, ' ' , `students`.`name`) AS fullname, `exam_student`.`vote`, SUM(`exam_student`.`exam_id`)
+<!-- SELECT CONCAT(`students`.`surname`, ' ' , `students`.`name`) AS fullname, `exam_student`.`vote`, SUM(`exam_student`.`exam_id`)
 FROM `students`
 INNER JOIN `exam_student` ON `exam_student`.`student_id` = `students`.`id`
 WHERE `exam_student`.`vote` <= 18
 GROUP BY fullname, `exam_student`.`vote`
-ORDER BY `students`.`surname`;
+ORDER BY `students`.`surname`; -->
+
+SELECT CONCAT(students.surname, ' ', students.name) AS fullname, 
+       students.id AS student_id, 
+       courses.id AS course_id, 
+       courses.name AS course_name, 
+       COUNT(*) AS num_exams_taken, 
+       MAX(exam_student.vote) AS max_vote
+FROM `students`
+INNER JOIN `exam_student` ON `exam_student`.`student_id` = `students`.`id`
+INNER JOIN `exams` ON `exams`.`id` = `exam_student`.`exam_id`
+INNER JOIN `courses`ON `courses`.`id` = `exams`.`course_id`
+GROUP by `students`.`id`, `courses`.`id`
+HAVING `max_vote` >= 18;
 
 
 <!-- Query con GROUP BY -->
